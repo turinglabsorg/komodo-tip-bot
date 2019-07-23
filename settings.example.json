@@ -1,0 +1,44 @@
+{
+    "discord": {
+        "token": "BOT-TOKEN",
+        "user": "BOT-USERID",
+        "symbol": "#",
+        "name": "BOTNAMEINHELP"
+    },
+    
+    "coin": {
+        "type": "btc",
+        "name": "COINNAME",
+        "symbol": "TICKER",
+        "decimals": 8,
+        "withdrawFee": 0.01,
+        "port": 111111,
+        "user": "RPCUSER",
+        "pass": "RPCPASSWORD"
+    },
+
+    "mysql": {
+        "db": "MYSQLDB",
+        "table": "MYSQLTABLE",
+        "user": "MYSQLUSER",
+        "pass": "MYSQLPASSWORD"
+    },
+
+    "commands": {
+        "example": []
+    },
+
+    "pools": {
+        "pool": {
+            "printName": "Pool",
+            "admins": [],
+            "members": []
+        },
+
+        "giveaways": {
+            "printName": "Giveaways",
+            "admins": [],
+            "members": []
+        }
+    }
+}
