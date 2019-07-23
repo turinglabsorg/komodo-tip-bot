@@ -1,13 +1,13 @@
 {
-    "name": "tip-bot",
+    "name": "komodo-tip-bot",
     "version": "2.0.0",
-    "description": "A BTC and ERC20 TipBot for Discord.",
-    "author": "Luke Parker/kayabaNerve",
+    "description": "A Komodo TipBot for Discord.",
+    "author": "turinglabs",
     "license": "MIT",
     "main": "main.js",
     "repository": {
         "type": "git",
-        "url": "https://github.com/kayabaNerve/tip-bot.git"
+        "url": "https://github.com/turinglabsorg/komodo-tip-bot.git"
     },
     "dependencies": {
         "axios": "^0.19.0",
