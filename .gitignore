@@ -9,6 +9,9 @@ settings_lyra.json
 node_modules/
 .npm
 
+#PouchDB databases
+users/
+
 # Output of 'npm pack'.
 *.tgz
 

@@ -1,15 +1,11 @@
 //MySQL and BN libs.
-var mysql = require("promise-mysql");
 var BN = require("bignumber.js");
+var PouchDB = require("pouchdb");
+
 BN.config({
     ROUNDING_MODE: BN.ROUND_DOWN,
     EXPONENTIAL_AT: process.settings.coin.decimals + 1
 });
-
-//Definition of the table: `name VARCHAR(64), address VARCHAR(64), balance VARCHAR(64), notify tinyint(1)`.
-
-//MySQL connection and table vars.
-var connection, table;
 
 //RAM cache of users.
 var users;
@@ -27,38 +23,57 @@ async function checkAmount(amount) {
     return true;
 }
 
+//Finds user in database
+async function findUser(user, client){
+    return new Promise(async response => {
+        var db = new PouchDB('users');
+        var dbcheck = await db.allDocs()
+        var found = false
+        for(var i = 0; i < dbcheck.rows.length; i++){
+            let entry = dbcheck.rows[i]
+            let userDB = await db.get(entry.id)
+            if(userDB[client + '_id'] !== undefined && userDB[client + '_id'] === user){
+                found = userDB
+            }
+        }
+
+        response(found)
+    })
+}
+
 //Creates a new user.
-async function create(user) {
+async function create(user, client) {
     //If the user already exists, return.
-    if (users[user]) {
-        return false;
+    let found = await findUser(user, client)
+
+    if(found === false){
+        let toStore = {}
+        toStore[client + '_id'] = user
+        toStore['address'] = ''
+        toStore['notify'] = 0
+
+        var db = new PouchDB('users')
+        await db.post(toStore)
+        let newAddress = await process.core.coin.createAddress()
+        await setAddress(user, newAddress, client);
+        return true
+    }else{
+        return false
     }
-
-    //Create the new user, with a blank address, balance of 0, and the notify flag on.
-    await connection.query("INSERT INTO " + table + " VALUES(?, ?, ?, ?)", [user, "", "0", 1]);
-    //Create the new user in the RAM cache, with a status of no address, balance of 0, and the notify flag on.
-    users[user] = {
-        address: false,
-        balance: BN(0),
-        notify: true
-    };
-    await setAddress(user, await process.core.coin.createAddress(user));
-
-    //Return true on success.
-    return true;
 }
 
 //Sets an user's address.
-async function setAddress(user, address) {
-    //If they already have an addrwss, return.
-    if (typeof(users[user].address) === "string") {
-        return;
+async function setAddress(user, address, client) {
+   let userDB = await findUser(user, client)
+    if(userDB['address'] !== ''){
+        return false
     }
+    userDB.address = address
 
-    //Update the table with the address.
-    await connection.query("UPDATE " + table + " SET address = ? WHERE name = ?", [address, user]);
-    //Update the RAM cache.
-    users[user].address = address;
+    var db = new PouchDB('users')
+    await db.put(userDB)
+
+    return true
 }
 
 
@@ -117,16 +132,18 @@ async function fixBalance(user){
 }
 
 //Updates the notify flag.
-async function setNotified(user) {
+async function setNotified(user, client) {
     //Update the table with a turned off notify flag.
-    await connection.query("UPDATE " + table + " SET notify = ? WHERE name = ?", [0, user]);
-    //Update the RAM cache.
-    users[user].notify = false;
+    let userDB = await findUser(user, client)
+    userDB.notify = false
+    var db = new PouchDB('users')
+    await db.put(userDB)
 }
 
 //Returns an user's address.
-async function getAddress(user) {
-    return users[user].address;
+async function getAddress(user, client) {
+    let userDB = await findUser(user, client)
+    return userDB.address;
 }
 
 //Returns an user's balance
@@ -136,27 +153,21 @@ async function getBalance(user) {
 }
 
 //Returns an user's notify flag.
-async function getNotify(user) {
-    return users[user].notify;
+async function getNotify(user, client) {
+    let userDB = await findUser(user, client)
+    return userDB.notify;
 }
 
 module.exports = async () => {
-    //Connects to MySQL.
-    connection = await mysql.createConnection({
-        host: "localhost",
-        database: process.settings.mysql.db,
-        user: process.settings.mysql.user,
-        password: process.settings.mysql.pass
-    });
-    //Sets the table from the settings.
-    table = process.settings.mysql.table;
+    //Connects to PouchDB.
+    connection = new PouchDB('users')
 
     //Init the RAM cache.
     users = {};
     //Init the handled array.
     handled = [];
     //Gets every row in the table.
-    var rows = await connection.query("SELECT * FROM " + table);
+    var rows = await connection.allDocs()
     //Iterate over each row, creating an user object for each.
     var i;
     for (i in rows) {
@@ -172,12 +183,6 @@ module.exports = async () => {
 
     }
 
-    //Make sure all the pools have accounts.
-    for (i in process.settings.pools) {
-        //Create an account for each. If they don't have one, this will do nothing.
-        await create(i);
-    }
-
     //Return all the functions.
     return {
         create: create,
@@ -186,7 +191,8 @@ module.exports = async () => {
         setNotified: setNotified,
         getAddress: getAddress,
         getBalance: getBalance,
-        getNotify: getNotify
+        getNotify: getNotify,
+        findUser: findUser
     };
 };
 
@@ -194,7 +200,7 @@ module.exports = async () => {
 setInterval(async () => {
     for (var user in users) {
         //If that user doesn't have an address, continue.
-        if (users[user].address === false) {
+        if (users[user].address === false || users[user].address === undefined) {
             continue;
         }
 

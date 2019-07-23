@@ -9,24 +9,17 @@ var botsymbol = process.settings.discord.symbol;
 var help = `To run a command, either preface it with ` + botsymbol + ` (` + botsymbol + `deposit, ` + botsymbol + `tip) 
 This bot does use decimals, and has 8 decimals of accuracy. 
 
-\`\`\`
-` + botsymbol + `balance 
-\`\`\`
+\`\`\`` + botsymbol + ` balance\`\`\`
 Prints your **balance**. 
 
-\`\`\`
-` + botsymbol + `tip <@PERSON> <AMOUNT>
-\`\`\`
-**Tips** the person that amount of LYRA. 
+\`\`\`` + botsymbol + ` tip <@PERSON> <AMOUNT>\`\`\`
+**Tips** the person that amount of `+ process.settings.coin.symbol +`. 
 
-\`\`\` 
-` + botsymbol + `withdraw <AMOUNT> <ADDRESS>
-\`\`\` 
-**Withdraws** AMOUNT to ADDRESS, charging a 0.01 LYRA fee. 
+\`\`\`` + botsymbol + ` withdraw <AMOUNT> <ADDRESS>\`\`\` 
+**Withdraws** AMOUNT to ADDRESS, charging a 0.01 `+ process.settings.coin.symbol +` fee. 
 
-\`\`\` 
-` + botsymbol + `deposit 
-\`\`\`
+\`\`\`` + botsymbol + ` deposit\`\`\`
+
 Prints your personal deposit **address**.`
 
 module.exports = async (msg) => {

@@ -27,27 +27,6 @@ async function listUnspent(address) {
     return await client.listUnspent();
 }
 
-async function getStakingStatus() {
-    var rpcuser = process.settings.coin.user
-    var rpcpassword = process.settings.coin.pass
-    
-    var response = 
-    await axios.post(
-        'http://localhost:42223',
-        {
-            id: Math.floor((Math.random() * 100000) + 1),
-            params: [],
-            method: 'getstakingstatus'
-        },
-        {
-            headers: { Authorization: 'Basic ' + Buffer.from(rpcuser + ":" + rpcpassword).toString("base64") }
-        }
-    ).catch(err => {
-        return err
-    })
-    return response.data.result
-}
-
 async function checkSender(tx, debug = false){
     var sender = tx.address
     var rawtransaction = await client.getRawTransaction(tx.txid)
@@ -86,38 +65,6 @@ async function fixAmountSend(address, tx, amount){
     }
 
     return false
-}
-
-//Get staking reward
-async function getStakingReward(tx, address){
-    var rawtransaction = await client.getRawTransaction(tx.txid)
-    tx = await client.decodeRawTransaction(rawtransaction)
-    
-    var totalinputs = 0
-    for(var i=0; i < tx.vin.length; i++){
-        var vinraw = await client.getRawTransaction(tx.vin[i].txid)
-        var vintx = await client.decodeRawTransaction(vinraw)
-        for(var ix=0; ix < tx.vin.length; ix++){
-            if(vintx.vout[tx.vin[ix].vout].scriptPubKey.addresses){
-                if(vintx.vout[tx.vin[ix].vout].scriptPubKey.addresses.indexOf(address) !== -1){
-                   totalinputs += vintx.vout[tx.vin[ix].vout].value
-                }
-            }
-        }
-    }
-    
-    var totaloutputs = 0
-    for(var i=0; i < tx.vout.length; i++){
-        var vout = tx.vout[i]
-        if(vout.scriptPubKey.addresses){
-            if(vout.scriptPubKey.addresses.indexOf(address) !== -1){
-                totaloutputs += vout.value
-            }
-        }
-    }
-    var stakingreward = totaloutputs - totalinputs
-    stakingreward = parseFloat(stakingreward.toFixed(8))
-    return stakingreward
 }
 
 //Sends amount to address.
@@ -182,7 +129,7 @@ module.exports = async () => {
         var txsTemp
         txs = {}
         if(mode !== 'light'){
-            txsTemp = await client.listTransactions("",99999999999);
+            txsTemp = await client.listTransactions("",9999999);
         }else{
             txsTemp = await client.listTransactions();
         }
@@ -214,8 +161,6 @@ module.exports = async () => {
         send: send,
         listUnspent: listUnspent,
         checkSender: checkSender,
-        fixAmountSend: fixAmountSend,
-        getStakingStatus: getStakingStatus,
-        getStakingReward: getStakingReward
+        fixAmountSend: fixAmountSend
     };
 };

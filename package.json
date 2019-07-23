@@ -5,6 +5,9 @@
     "author": "turinglabs",
     "license": "MIT",
     "main": "main.js",
+    "scripts": {
+        "dev": "nodemon main.js"
+    },
     "repository": {
         "type": "git",
         "url": "https://github.com/turinglabsorg/komodo-tip-bot.git"
@@ -14,10 +17,11 @@
         "bignumber.js": "^7.2.1",
         "bitcoin-core": "^2.0.0",
         "discord.js": "^11.3.2",
-        "promise-mysql": "^3.3.1",
+        "pouchdb": "^7.1.1",
         "web3": "^1.0.0-beta.36"
     },
     "devDependencies": {
-        "eslint": "^5.1.0"
+        "eslint": "^5.1.0",
+        "nodemon": "^1.19.1"
     }
 }
