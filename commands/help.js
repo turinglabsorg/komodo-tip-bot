@@ -21,6 +21,7 @@ Prints your **balance**.
 Prints your personal reusable deposit **address**.`
 
 module.exports = async (client, msg) => {
+    console.log('Help requested from user #' + msg.sender)
     process.core.router.pm(client, {
         embed: {
             description: help

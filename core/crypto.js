@@ -85,7 +85,8 @@ async function send(sender, address, amount) {
         }
         if(inputamount >= amount){
             //Creating raw transaction
-            var changeamount = inputamount - amount - process.settings.coin.withdrawFee 
+            var changeamount = inputamount - amount - process.settings.coin.withdrawFee
+            changeamount = changeamount.toFixed(8)
             var outputs = {}
             outputs[address] = parseFloat(amount),
             outputs[sender] = parseFloat(changeamount)

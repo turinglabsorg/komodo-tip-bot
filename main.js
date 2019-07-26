@@ -9,7 +9,7 @@ process.handleMessage = async function handleMessage(msg, client) {
     //Get the numeric ID of whoever sent the message.
     if(client === 'discord'){
         var sender = msg.author.id;
-        
+        console.log('Received new message from Discord user #'+sender)
         //Do not handle messages from itself.
         if (sender === process.settings[client].user) {
             return;
@@ -85,8 +85,8 @@ process.handleMessage = async function handleMessage(msg, client) {
             obj: msg
         }
 
-        if (typeof(commands[msg.text[0]]) !== "undefined") {
-            await commands[msg.text[0]](client, msgObj);
+        if (typeof(commands[text[0]]) !== "undefined") {
+            await commands[text[0]](client, msgObj);
             return;
         }
 
@@ -121,12 +121,13 @@ async function main() {
         tip:      require("./commands/tip.js"),
         withdraw: require("./commands/withdraw.js")
     };
-
 }
 
 (async () => {
     try {
+        console.log('Starting BOT')
         await main();
+        console.log('BOT started successfully')
     } catch(e) {
         /*eslint no-console: ["error", {allow: ["error"]}]*/
         console.error(e);

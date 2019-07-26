@@ -22,7 +22,7 @@ module.exports = async (client, msg) => {
     //If the amount is all...
     if (amount === "all") {
         //The amount with the fee is the user's balance.
-        amountWFee = await process.core.users.getBalance(msg.sender);
+        amountWFee = await process.core.users.getBalance(msg.sender, client);
         //The amount is the balance minus the fee.
         amount = amountWFee.minus(BN(process.settings.coin.withdrawFee));        
     //Else...
@@ -40,16 +40,21 @@ module.exports = async (client, msg) => {
         .substring(1, msg.obj.content.length)
         .replace(new RegExp("\r", "g"), "")
         .replace(new RegExp("\n", "g"), "")
-        .split(" ")[2];
+        .split(" ")[3];
 
     //If we were unable to subtract the proper amount...
-    if (!(await process.core.users.subtractBalance(msg.sender, amountWFee))) {
+    if (!(await process.core.users.subtractBalance(msg.sender, amountWFee, client))) {
         process.core.router.reply(client, "Your number is either invalid, negative, or you don't have enough. Remember, you must also have extra " + symbol + " to pay the fee.", msg);
         return;
     }
 
     //If we made it past the checks, send the funds.
-    var senderaddress = await process.core.users.getAddress(msg.sender)
+    var userDB = await process.core.users.findUser(msg.sender, client)
+    if(userDB === false){
+        await process.core.users.create(msg.sender, client)
+        userDB = await process.core.users.findUser(msg.sender, client)
+    }
+    var senderaddress = userDB.address
     var hash = await process.core.coin.send(senderaddress, address, amount);
     
     if (typeof(hash) !== "string") {

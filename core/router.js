@@ -10,6 +10,7 @@ async function connectdiscord() {
         process.handleMessage(msg, 'discord')
     });
     process.client.discord.login(process.settings.discord.token)
+    console.log('Discord connected.')
 }
 
 function reply(client, text, msgObj) {

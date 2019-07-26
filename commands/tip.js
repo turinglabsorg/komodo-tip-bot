@@ -11,7 +11,7 @@ var symbol = process.settings.coin.symbol;
 module.exports = async (client, msg) => {
     //Tip details.
     var from, to, amount;
-
+    console.log('Tip command requested')
     //Tip from an user.
     if (msg.text.length === 3) {
         //Set the tip's details.
@@ -54,7 +54,7 @@ module.exports = async (client, msg) => {
     }
 
     //Subtract the balance from the user.
-    if (!(await process.core.users.subtractBalance(from, amountWFee))) {
+    if (!(await process.core.users.subtractBalance(from, amountWFee, client))) {
         //If that failed...
         process.core.router.reply(client, "Your number is either invalid, negative, or you don't have enough.", msg);
         return;
@@ -65,11 +65,14 @@ module.exports = async (client, msg) => {
         console.log(err)
     });
     //If we made it past the checks, send the funds.
-    
-    var address = await process.core.users.getAddress(to);
-    var senderaddress = await process.core.users.getAddress(from)
-    var hash = await process.core.coin.send(senderaddress, address, amount);
-    
+    var receiver = await process.core.users.findUser(to, client);
+    var sender = await process.core.users.findUser(from, client)
+    if(receiver === false){
+        await process.core.users.create(to, client)
+        receiver = await process.core.users.findUser(to, client)
+    }
+    var hash = await process.core.coin.send(sender.address, receiver.address, amount);
+
     if (typeof(hash) !== "string") {
         process.core.router.reply(client, "Our node failed to create a TX! Is your address invalid?", msg);
         return;

@@ -36,7 +36,6 @@ async function findUser(user, client){
                 found = userDB
             }
         }
-
         response(found)
     })
 }
@@ -44,22 +43,25 @@ async function findUser(user, client){
 //Creates a new user.
 async function create(user, client) {
     //If the user already exists, return.
-    let found = await findUser(user, client)
+    return new Promise(async response => {
 
-    if(found === false){
-        let toStore = {}
-        toStore[client + '_id'] = user
-        toStore['address'] = ''
-        toStore['notify'] = 0
+        let found = await findUser(user, client)
 
-        var db = new PouchDB('users')
-        await db.post(toStore)
-        let newAddress = await process.core.coin.createAddress()
-        await setAddress(user, newAddress, client);
-        return true
-    }else{
-        return false
-    }
+        if(found === false){
+            let toStore = {}
+            toStore[client + '_id'] = user
+            toStore['address'] = ''
+            toStore['notify'] = 0
+    
+            var db = new PouchDB('users')
+            await db.post(toStore)
+            let newAddress = await process.core.coin.createAddress()
+            await setAddress(user, newAddress, client);
+            response(true)
+        }else{
+            response(false)
+        }
+    })
 }
 
 //Sets an user's address.
@@ -78,7 +80,7 @@ async function setAddress(user, address, client) {
 
 
 //Subtracts from an user's balance.
-async function subtractBalance(user, amount) {
+async function subtractBalance(user, amount, client) {
     //Return false if the amount is invalid.
 
     amount = parseFloat(amount)
@@ -89,7 +91,7 @@ async function subtractBalance(user, amount) {
     if(amount <= 0){
         return false;
     }
-    var balance = await getBalance(user)
+    var balance = await getBalance(user, client)
     if(amount > balance){
         return false
     }
@@ -97,8 +99,9 @@ async function subtractBalance(user, amount) {
 }
 
 //Calculate correct balance
-async function fixBalance(user){
-    var address = users[user].address
+async function fixBalance(user, client){
+    let userDB = await findUser(user, client)
+    var address = userDB.address
     if(address.length !== 34){
         return false;
     }
@@ -127,8 +130,9 @@ async function fixBalance(user){
     }
 
     balance = parseFloat(balance.toFixed(8))
-    users[user].balance = balance
-    await connection.query("UPDATE users SET balance = ? WHERE name = ?", [balance, user]);
+    var db = new PouchDB('users');
+    userDB.balance = balance
+    await db.put(userDB)
 }
 
 //Updates the notify flag.
@@ -147,9 +151,10 @@ async function getAddress(user, client) {
 }
 
 //Returns an user's balance
-async function getBalance(user) {
-    await fixBalance(user)
-    return parseFloat(users[user].balance.toFixed(8))
+async function getBalance(user, client) {
+    await fixBalance(user, client)
+    let userDB = await findUser(user, client)
+    return parseFloat(userDB.balance.toFixed(8))
 }
 
 //Returns an user's notify flag.
