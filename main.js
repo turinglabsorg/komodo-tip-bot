@@ -33,32 +33,8 @@ process.handleMessage = async function handleMessage(msg, client) {
         if (text.substr(0, process.settings[client].symbol.length) !== process.settings[client].symbol) {
             return;
         }
+
         
-        if (
-            //Create an user if they don't have an account already.
-            //If they didn't have an account, and create returned true...
-            (await process.core.users.create(sender, client)) ||
-            //Or if they need to be notified...
-            (await process.core.users.getNotify(sender, client))
-        ) {
-            //Give them the notified warning.
-            process.core.router.reply(client, `Hi! :raised_hand: 
-                I'm **`+process.settings[client].name+`**! A bot created by **TuringLabs** at your service! :robot:
-                
-                You can use me for **`+process.settings.coin.symbol+`** deposit, send and tip!
-                
-                The command you just gave me was used to create your account! To know the list of commands, you can type 
-                
-                \`\`\`*help\`\`\`
-                
-                Every transaction you make through me, will be written directly inside the `+process.settings.coin.name+` blockchain, so you can check your operations using our BlockExplorer! 
-                
-                **DISCLAIMER**:
-                *By continuing to use this bot, you agree to release the creator, owners, all maintainers of the bot, and TuringLabs from any legal liability.*
-            `, msg);
-            //Mark them as notified.
-            await process.core.users.setNotified(sender, client);
-        }
 
         //Filter the message.
         text = text
@@ -67,22 +43,48 @@ process.handleMessage = async function handleMessage(msg, client) {
             .toLowerCase()                      //Make it lower case.
             .replace(new RegExp("\r", "g"), "") //Remove any \r characters.
             .replace(new RegExp("\n", "g"), "") //Remove any \n characters.
-            .split(" ");                        //Split it among spaces.
+            .split(" ");  //Split it among spaces.
+            
+            let msgObj = {
+                text: text,
+                sender: sender,
+                obj: msg
+            }
+            
+            if (
+                //Create an user if they don't have an account already.
+                //If they didn't have an account, and create returned true...
+                (await process.core.users.create(sender, client)) ||
+                //Or if they need to be notified...
+                (await process.core.users.getNotify(sender, client))
+            ) {
+                //Give them the notified warning.
+                process.core.router.reply(client, `Hi! :raised_hand: 
+                    I'm **`+process.settings[client].name+`**! A bot created by **TuringLabs** at your service! :robot:
+                    
+                    You can use me for **`+process.settings.coin.symbol+`** deposit, send and tip!
+                    
+                    The command you just gave me was used to create your account! To know the list of commands, you can type 
+                    
+                    \`\`\`*help\`\`\`
+                    
+                    Every transaction you make through me, will be written directly inside the `+process.settings.coin.name+` blockchain, so you can check your operations using our BlockExplorer! 
+                    
+                    **DISCLAIMER**:
+                    *By continuing to use this bot, you agree to release the creator, owners, all maintainers of the bot, and TuringLabs from any legal liability.*
+                `, msgObj);
+                //Mark them as notified.
+                await process.core.users.setNotified(sender, client);
+            }
 
         //If the command is channel locked...
         if (typeof(process.settings.commands[text[0]]) !== "undefined") {
             //And this is not an approved channel...
             if (process.settings.commands[text[0]].indexOf(msg.channel.id) === -1) {
                 //Print where it can be used.
-                process.core.router.reply(client, "That command can only be run in:\r\n<#" + process.settings.commands[text[0]].join(">\r\n<#") + ">", msg);
+                process.core.router.reply(client, "That command can only be run in:\r\n<#" + process.settings.commands[text[0]].join(">\r\n<#") + ">", msgObj);
                 return;
             }
-        }
-
-        let msgObj = {
-            text: text,
-            sender: sender,
-            obj: msg
         }
 
         if (typeof(commands[text[0]]) !== "undefined") {
