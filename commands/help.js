@@ -16,6 +16,9 @@ Prints your **balance**.
 \`\`\`` + botsymbol + ` withdraw <AMOUNT> <ADDRESS>\`\`\` 
 **Withdraws** AMOUNT to ADDRESS, charging a ` + fee + ` `+ process.settings.coin.symbol +` fee. 
 
+\`\`\`` + botsymbol + ` rain <AMOUNT>\`\`\` 
+**Rain** the AMOUNT divided by all the online users. 
+
 \`\`\`` + botsymbol + ` deposit\`\`\`
 
 Prints your personal reusable deposit **address**.`
