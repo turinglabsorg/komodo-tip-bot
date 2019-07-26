@@ -7,10 +7,10 @@ BN.config({
 
 var symbol = process.settings.coin.symbol;
 
-module.exports = async (msg) => {
+module.exports = async (client, msg) => {
     //Check the argument count.
     if (msg.text.length !== 3) {
-        msg.obj.reply("You used the wrong amount of arguments.");
+        process.core,router.reply(client, "You used the wrong amount of arguments.", msg);
         return;
     }
 
@@ -44,7 +44,7 @@ module.exports = async (msg) => {
 
     //If we were unable to subtract the proper amount...
     if (!(await process.core.users.subtractBalance(msg.sender, amountWFee))) {
-        msg.obj.reply("Your number is either invalid, negative, or you don't have enough. Remember, you must also have extra " + symbol + " to pay the fee.");
+        process.core.router.reply(client, "Your number is either invalid, negative, or you don't have enough. Remember, you must also have extra " + symbol + " to pay the fee.", msg);
         return;
     }
 
@@ -53,14 +53,14 @@ module.exports = async (msg) => {
     var hash = await process.core.coin.send(senderaddress, address, amount);
     
     if (typeof(hash) !== "string") {
-        msg.obj.reply("Our node failed to create a TX! Is your address invalid?");
+        process.core.router.reply(client, "Our node failed to create a TX! Is your address invalid?", msg);
         return;
     }
     
     if (hash.length !== 64) {
-        msg.obj.reply("Our node failed to create a TX! Is your address invalid?");
+        process.core.router.reply(client, "Our node failed to create a TX! Is your address invalid?", msg);
         return;
     }
     
-    msg.obj.reply("Success! Your TXID is " + hash + ".");
+    process.core.router.reply(client, "Success! Your TXID is " + hash + ".", msg);
 };

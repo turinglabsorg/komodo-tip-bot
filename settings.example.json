@@ -7,7 +7,6 @@
     },
     
     "coin": {
-        "type": "btc",
         "name": "COINNAME",
         "symbol": "TICKER",
         "decimals": 8,
@@ -17,28 +16,7 @@
         "pass": "RPCPASSWORD"
     },
 
-    "mysql": {
-        "db": "MYSQLDB",
-        "table": "MYSQLTABLE",
-        "user": "MYSQLUSER",
-        "pass": "MYSQLPASSWORD"
-    },
-
     "commands": {
         "example": []
-    },
-
-    "pools": {
-        "pool": {
-            "printName": "Pool",
-            "admins": [],
-            "members": []
-        },
-
-        "giveaways": {
-            "printName": "Giveaways",
-            "admins": [],
-            "members": []
-        }
     }
 }

@@ -31,7 +31,5 @@ To install the bot:
 - Install NodeJS dependencies via `npm i`.
     - `discord.js` will print several warnings about requiring a peer but none was installed. These are normal, and refer to optional packages for connecting to voice channels, something we don't do.
 
-There is also a giveaway command to run giveaways with. If you don't want it, either don't setup the `giveaways` pool or comment out the line that loads it in `main.js`. To use it, run `!giveaway Ts Ww A`, where T is the time in seconds (or use "m" as a suffix for minutes), W is the amount of winners, and A is the amount each win. The amount will come from the `giveaways` pool and be tipped out to the winners. Giveaway pool is not restricted to admins anymore.
-
 Want to donate? 
 I accept BTC => 3G4oGSVuY2DmAUSzmvj8qJ7vd9KSaTR2NP

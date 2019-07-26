@@ -5,18 +5,6 @@ var path = require("path");
 var commands;
 
 //Parses a message.
-async function parseMsg(msg, client) {
-    //If the command exists, hand it off.
-    if (typeof(commands[msg.text[0]]) !== "undefined") {
-        await commands[msg.text[0]](msg, client);
-        return;
-    }
-
-    //Else, print that the command doesn't exist.
-    msg.obj.reply("That is not a command. Run \"" + process.settings[client].symbol + "help\" to get a list of commands or edit your last message.");
-}
-
-//Prepares, verifies, and formats a message.
 process.handleMessage = async function handleMessage(msg, client) {
     //Get the numeric ID of whoever sent the message.
     if(client === 'discord'){
@@ -54,20 +42,20 @@ process.handleMessage = async function handleMessage(msg, client) {
             (await process.core.users.getNotify(sender, client))
         ) {
             //Give them the notified warning.
-            msg.reply(`Hi! :raised_hand: 
-            I'm **`+process.settings[client].name+`**! A bot created by **TuringLabs** at your service! :robot:
-            
-            You can use me for **`+process.settings.coin.symbol+`** deposit, send and tip!
-            
-            The command you just gave me was used to create your account! To know the list of commands, you can type 
-            
-            \`\`\`*help\`\`\`
-            
-            Every transaction you make through me, will be written directly inside the `+process.settings.coin.name+` blockchain, so you can check your operations using our BlockExplorer! 
-            
-            **DISCLAIMER**:
-            *By continuing to use this bot, you agree to release the creator, owners, all maintainers of the bot, and TuringLabs from any legal liability.*
-            `);
+            process.core.router.reply(client, `Hi! :raised_hand: 
+                I'm **`+process.settings[client].name+`**! A bot created by **TuringLabs** at your service! :robot:
+                
+                You can use me for **`+process.settings.coin.symbol+`** deposit, send and tip!
+                
+                The command you just gave me was used to create your account! To know the list of commands, you can type 
+                
+                \`\`\`*help\`\`\`
+                
+                Every transaction you make through me, will be written directly inside the `+process.settings.coin.name+` blockchain, so you can check your operations using our BlockExplorer! 
+                
+                **DISCLAIMER**:
+                *By continuing to use this bot, you agree to release the creator, owners, all maintainers of the bot, and TuringLabs from any legal liability.*
+            `, msg);
             //Mark them as notified.
             await process.core.users.setNotified(sender, client);
         }
@@ -86,18 +74,25 @@ process.handleMessage = async function handleMessage(msg, client) {
             //And this is not an approved channel...
             if (process.settings.commands[text[0]].indexOf(msg.channel.id) === -1) {
                 //Print where it can be used.
-                msg.reply("That command can only be run in:\r\n<#" + process.settings.commands[text[0]].join(">\r\n<#") + ">");
+                process.core.router.reply(client, "That command can only be run in:\r\n<#" + process.settings.commands[text[0]].join(">\r\n<#") + ">", msg);
                 return;
             }
         }
+
+        let msgObj = {
+            text: text,
+            sender: sender,
+            obj: msg
+        }
+
+        if (typeof(commands[msg.text[0]]) !== "undefined") {
+            await commands[msg.text[0]](client, msgObj);
+            return;
+        }
+
+        process.core.router.reply(client, "That is not a command. Run \"" + process.settings[client].symbol + " help\" to get a list of commands or edit your last message.", msgObj);
     }
 
-    //if we made it to this point, parse the message.
-    parseMsg({
-        text: text,
-        sender: sender,
-        obj: msg
-    }, client);
 }
 
 async function main() {
@@ -124,8 +119,7 @@ async function main() {
         deposit:  require("./commands/deposit.js"),
         balance:  require("./commands/balance.js"),
         tip:      require("./commands/tip.js"),
-        withdraw: require("./commands/withdraw.js"),
-        giveaway: require("./commands/giveaway.js")
+        withdraw: require("./commands/withdraw.js")
     };
 
 }

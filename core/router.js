@@ -12,8 +12,25 @@ async function connectdiscord() {
     process.client.discord.login(process.settings.discord.token)
 }
 
+function reply(client, text, msgObj) {
+    if(client === 'discord'){
+        msgObj.obj.reply(text)
+        return true
+    }else if(client === 'twitter'){
+
+    }
+}
+
+function pm(client, text, msgObj){
+    if(client === 'discord'){
+        msgObj.obj.author.send(text)
+    }
+}
+
 module.exports = async () => {
     return {
-        connectdiscord: connectdiscord
+        connectdiscord: connectdiscord,
+        reply: reply,
+        pm: pm
     };
 };
