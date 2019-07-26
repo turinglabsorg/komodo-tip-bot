@@ -60,10 +60,6 @@ module.exports = async (client, msg) => {
         return;
     }
 
-    //Create an account for the user if they don't have one.
-    await process.core.users.create(to).catch(err => {
-        console.log(err)
-    });
     //If we made it past the checks, send the funds.
     var receiver = await process.core.users.findUser(to, client);
     var sender = await process.core.users.findUser(from, client)

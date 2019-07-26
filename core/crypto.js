@@ -24,7 +24,7 @@ async function getTransactions(address) {
 }
 
 async function listUnspent(address) {
-    return await client.listUnspent();
+    return await client.listUnspent(0);
 }
 
 async function checkSender(tx, debug = false){
@@ -71,7 +71,7 @@ async function fixAmountSend(address, tx, amount){
 async function send(sender, address, amount) {
     try {
         amount = parseFloat(amount)
-        var unspent = await client.listUnspent(0,99999);
+        var unspent = await client.listUnspent(0);
         var inputs = []
         var inputamount = 0
         for(var i = 0; i < unspent.length; i++){
