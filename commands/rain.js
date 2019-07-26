@@ -32,21 +32,28 @@ module.exports = async (client, msg) => {
         }
 
         var rainusers = [] 
+        var rainusersid = [] 
+
         if(client === 'discord'){
             process.client.discord.users.map(user => {
                 if(user.bot === false){
-                    if(rainusers.indexOf(user.id) === -1){
-                        rainusers.push(user.id)
+                    if(rainusersid.indexOf(user.id) === -1){
+                        rainusers.push(user)
+                        rainusersid.push(user.id)
                     }
                 }
             });
+
             let fees = rainusers.length * process.settings.coin.withdrawFee
             let amountavailable = amount - fees
             var amountperuser = (amountavailable / rainusers.length).toFixed(process.settings.coin.decimals)
             var sender = await process.core.users.findUser(from, client)
             var sent = 0 
+            var tagusers = ''
+
             for(let u in rainusers){
-                let to = rainusers[u]
+                let to = rainusers[u].id
+                tagusers += '<@' + rainusers[u].id + '> '
                 if(to !== from){
                     var receiver = await process.core.users.findUser(to, client);
                     if(receiver === false){
@@ -59,7 +66,7 @@ module.exports = async (client, msg) => {
             }
         }
 
-        process.core.router.reply(client, 'You rained ' + amountperuser + ' ' + symbol + ' to ' + sent + ' users!', msg);
+        process.core.router.reply(client, 'You rained ' + amountperuser + ' ' + symbol + ' to '+ tagusers +'!', msg);
 
     }else{
         process.core.router.reply(client, "You used the wrong amount of arguments.", msg);
