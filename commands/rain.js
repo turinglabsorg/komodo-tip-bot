@@ -49,11 +49,20 @@ module.exports = async (client, msg) => {
             var amountperuser = (amountavailable / rainusers.length).toFixed(process.settings.coin.decimals)
             var sender = await process.core.users.findUser(from, client)
             var sent = 0 
-            var tagusers = ''
-
+            var tagusers = []
+            var x=0 
             for(let u in rainusers){
                 let to = rainusers[u].id
-                tagusers += '<@' + rainusers[u].id + '> '
+                if(!tagusers[x]){
+                    tagusers[x] = ''
+                }
+                if(tagusers[x].length < 1500){
+                    tagusers[x] += '<@' + rainusers[u].id + '> '
+                }else{
+                    x++
+                    tagusers[x] = ''
+                    tagusers[x] += '<@' + rainusers[u].id + '> '
+                }
                 if(to !== from){
                     var receiver = await process.core.users.findUser(to, client);
                     if(receiver === false){
@@ -66,7 +75,11 @@ module.exports = async (client, msg) => {
             }
         }
 
-        process.core.router.reply(client, 'You rained ' + amountperuser + ' ' + symbol + ' to '+ tagusers +'!', msg);
+        process.core.router.reply(client, 'You rained ' + amountperuser + ' ' + symbol + ' to:', msg);
+        for(let t in tagusers){
+            let message = tagusers[t]
+            process.core.router.reply(client, message, msg);
+        }
 
     }else{
         process.core.router.reply(client, "You used the wrong amount of arguments.", msg);
