@@ -1,12 +1,11 @@
 # Multichannel wallet Bot for Komodo based Asset Chains.
 
-### A bot made for Discord, Twitter and more.
+### A bot made for Discord, Twitter (soon), Telegram (soon) and more.
 
 This code is based on kayabaNerve Tip Bot (https://github.com/kayabaNerve/tip-bot) with a lot of changes, from staking to true wallet management based on raw transactions. All references to ERC20 are removed.
 
 To install the bot:
-- If the coin is BTC based:
-    - Install your 'BTCd'.
+- Install Komodo and run your asset chain, then:
     - Edit the conf file to add `server=1`, `rpcuser=user`, and `rpcpass=pass` (with your own username and password).
     - Start the daemon.
     - Move `settings.example.json` to `settings.json`.
