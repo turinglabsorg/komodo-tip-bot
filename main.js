@@ -44,7 +44,7 @@ process.handleMessage = async function handleMessage(msg, client) {
             .replace(new RegExp("\r", "g"), "") //Remove any \r characters.
             .replace(new RegExp("\n", "g"), "") //Remove any \n characters.
             .split(" ");  //Split it among spaces.
-            
+
             let msgObj = {
                 text: text,
                 sender: sender,
@@ -59,19 +59,7 @@ process.handleMessage = async function handleMessage(msg, client) {
                 (await process.core.users.getNotify(sender, client))
             ) {
                 //Give them the notified warning.
-                process.core.router.reply(client, `Hi! :raised_hand: 
-                    I'm **`+process.settings[client].name+`**! A bot created by **TuringLabs** at your service! :robot:
-                    
-                    You can use me for **`+process.settings.coin.symbol+`** deposit, send and tip!
-                    
-                    The command you just gave me was used to create your account! To know the list of commands, you can type 
-                    
-                    \`\`\`*help\`\`\`
-                    
-                    Every transaction you make through me, will be written directly inside the `+process.settings.coin.name+` blockchain, so you can check your operations using our BlockExplorer! 
-                    
-                    **DISCLAIMER**:
-                    *By continuing to use this bot, you agree to release the creator, owners, all maintainers of the bot, and TuringLabs from any legal liability.*
+                process.core.router.reply(client, `Hi! :raised_hand:\r\nI'm **`+process.settings[client].name+`**! A bot created by **TuringLabs** at your service! :robot:\r\nYou can use me for **`+process.settings.coin.symbol+`** deposit, send and tip!\r\nThe command you just gave me was used to create your account! To know the list of commands, you can type\r\n\`\`\`*help\`\`\`\r\nEvery transaction you make through me, will be written directly inside the `+process.settings.coin.name+` blockchain, so you can check your operations using our BlockExplorer!\r\n\r\n**DISCLAIMER**:\r\n*By continuing to use this bot, you agree to release the creator, owners, all maintainers of the bot, and TuringLabs from any legal liability.*
                 `, msgObj);
                 //Mark them as notified.
                 await process.core.users.setNotified(sender, client);
