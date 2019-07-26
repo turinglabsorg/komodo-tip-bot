@@ -36,7 +36,7 @@ module.exports = async (client, msg) => {
 
         if(client === 'discord'){
             process.client.discord.users.map(user => {
-                if(user.bot === false){
+                if(user.bot === false && user.id !== from){
                     if(rainusersid.indexOf(user.id) === -1){
                         rainusers.push(user)
                         rainusersid.push(user.id)
