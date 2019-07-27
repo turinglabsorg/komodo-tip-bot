@@ -13,8 +13,8 @@ Prints your **balance**.
 \`\`\`` + botsymbol + ` tip <@PERSON> <AMOUNT>\`\`\`
 **Tips** the person that amount of `+ process.settings.coin.symbol +`. 
 
-\`\`\`` + botsymbol + ` withdraw <AMOUNT> <ADDRESS>\`\`\` 
-**Withdraws** AMOUNT to ADDRESS, charging a ` + fee + ` `+ process.settings.coin.symbol +` fee. 
+\`\`\`` + botsymbol + ` withdraw <AMOUNT>|<all> <ADDRESS>\`\`\` 
+**Withdraws** AMOUNT (or all) to ADDRESS, charging a ` + fee + ` `+ process.settings.coin.symbol +` fee. 
 
 \`\`\`` + botsymbol + ` rain <AMOUNT>\`\`\` 
 **Rain** the AMOUNT divided by all the online users. 
