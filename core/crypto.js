@@ -88,13 +88,14 @@ async function send(sender, address, amount) {
             var changeamount = inputamount - amount - process.settings.coin.withdrawFee
             changeamount = changeamount.toFixed(8)
             var outputs = {}
-            outputs[address] = parseFloat(amount),
-            outputs[sender] = parseFloat(changeamount)
+            outputs[address] = parseFloat(amount)
+            if(changeamount > 0 && changeamount > 0.0001){
+                outputs[sender] = parseFloat(changeamount)
+            }
             var rawtransaction = await client.createRawTransaction(inputs, outputs);
 
             //Signin raw transaction
             var signed = await client.signRawTransaction(rawtransaction);
-
             if(signed.complete === true){
                 //Sending raw transaction
                 var txid = await client.sendRawTransaction(signed.hex);
