@@ -24,7 +24,7 @@ module.exports = async (client, msg) => {
         //The amount with the fee is the user's balance.
         amountWFee = await process.core.users.getBalance(msg.sender, client);
         //The amount is the balance minus the fee.
-        amount = amountWFee.minus(BN(process.settings.coin.withdrawFee));        
+        amount = BN(amountWFee).minus(BN(process.settings.coin.withdrawFee));        
     //Else...
     } else {
         //Parse the amount (limited to the satoshi), and add the withdraw fee.
