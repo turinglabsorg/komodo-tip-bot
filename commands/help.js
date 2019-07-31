@@ -16,8 +16,8 @@ Prints your **balance**.
 \`\`\`` + botsymbol + ` withdraw <AMOUNT>|<all> <ADDRESS>\`\`\` 
 **Withdraws** AMOUNT (or all) to ADDRESS, charging a ` + fee + ` `+ process.settings.coin.symbol +` fee. 
 
-\`\`\`` + botsymbol + ` rain <AMOUNT>\`\`\` 
-**Rain** the AMOUNT divided by all the online users. 
+\`\`\`` + botsymbol + ` rain <AMOUNT> <MAX>\`\`\` 
+**Rain** the AMOUNT divided by <MAX> count of online users. If count is not provided is assumed as "all".
 
 \`\`\`` + botsymbol + ` deposit\`\`\`
 

@@ -11,12 +11,16 @@ var symbol = process.settings.coin.symbol;
 module.exports = async (client, msg) => {
     console.log('Tip command requested')
     //Tip from an user.
-    if (msg.text.length === 2) {
-        var from, amount, role;
+    if (msg.text.length >= 2) {
+        var from, amount, max;
         console.log('Rain requested from user #' + msg.sender)
-        from = msg.sender;
+        from = msg.sender
         amount = msg.text[1]
-        role = msg.text[2]
+        if(msg.text[2] !== undefined && msg.text[2] !== 'all'){
+            max = msg.text[2]
+        }else{
+            max = 999999999999999999
+        }
 
         if(amount <= 0) {
             process.core.router.reply(client, "Amount is invalid.", msg);
@@ -33,13 +37,14 @@ module.exports = async (client, msg) => {
 
         var rainusers = [] 
         var rainusersid = [] 
-
+        var count = 0
         if(client === 'discord'){
             process.client.discord.users.map(user => {
                 if(user.bot === false && user.id !== from){
-                    if(rainusersid.indexOf(user.id) === -1){
+                    if(rainusersid.indexOf(user.id) === -1 && count < max){
                         rainusers.push(user)
                         rainusersid.push(user.id)
+                        count ++
                     }
                 }
             });
@@ -48,7 +53,6 @@ module.exports = async (client, msg) => {
             let amountavailable = amount - fees
             var amountperuser = (amountavailable / rainusers.length).toFixed(process.settings.coin.decimals)
             var sender = await process.core.users.findUser(from, client)
-            var sent = 0 
             var tagusers = []
             var x=0 
             for(let u in rainusers){
@@ -64,21 +68,20 @@ module.exports = async (client, msg) => {
                     tagusers[x] += '<@' + rainusers[u].id + '> '
                 }
                 if(to !== from){
-                    var receiver = await process.core.users.findUser(to, client);
+                    var receiver = await process.core.users.findUser(to, client)
                     if(receiver === false){
                         await process.core.users.create(to, client)
                         receiver = await process.core.users.findUser(to, client)
                     }
-                    var hash = await process.core.coin.send(sender.address, receiver.address, amountperuser);
-                    sent++
+                    await process.core.coin.send(sender.address, receiver.address, amountperuser)
                 }
             }
         }
 
-        process.core.router.reply(client, 'You rained ' + amountperuser + ' ' + symbol + ' to:', msg);
+        process.core.router.reply(client, 'You rained ' + amountperuser + ' ' + symbol + ' to:', msg)
         for(let t in tagusers){
             let message = tagusers[t]
-            process.core.router.reply(client, message, msg);
+            process.core.router.reply(client, message, msg)
         }
 
     }else{
