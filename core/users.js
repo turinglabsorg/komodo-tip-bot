@@ -108,7 +108,7 @@ async function fixBalance(user, client){
     var i;
     var balance = 0;
     var parsed = [];
-    var unspent = await process.core.coin.listUnspent(0);
+    var unspent = await process.core.komodo.listUnspent(0);
     for(var i = 0; i < unspent.length; i++){
         var utxo = unspent[i]
         if(utxo.address === address && utxo.spendable === true){

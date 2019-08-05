@@ -32,7 +32,7 @@ module.exports = async (client, msg) => {
         amountWFee = amount.plus(BN(process.settings.coin.withdrawFee));
     }
 
-    //Get the address by filtering the message again, but not calling toLowerCase this time since addresses are case sensitive.
+    //Get the address by filtering the message again.
     var address = msg.obj.content
         .split(" ").filter((item) => {
             return item !== "";

@@ -1,30 +1,20 @@
 //BTC lib.
-var bitcoin = require("bitcoin-core");
 var axios = require('axios')
 //BTC RPC Client.
 var client;
 
-//RAM cache of all the addresses and TXs.
-var addresses, txs;
+//RAM cache of all the TXs.
+var txs;
 
 //Creates a new address.
 async function createAddress() {
     var address = await client.getNewAddress();
-    addresses.push(address);
     return address;
-}
-
-async function ownAddress(address) {
-    return addresses.indexOf(address) !== -1;
 }
 
 //Gets an address's transactions.
 async function getTransactions(address) {
     return txs[address];
-}
-
-async function listUnspent(address) {
-    return await client.listUnspent(0);
 }
 
 async function checkSender(tx, debug = false){
@@ -114,15 +104,8 @@ async function send(sender, address, amount) {
 
 module.exports = async () => {
     //Create the client.
-    client = new bitcoin({
-        host: "localhost",
-        port: process.settings.coin.port,
-        username: process.settings.coin.user,
-        password: process.settings.coin.pass
-    });
+    client = process.core.komodo
 
-    //Init the addresses array.
-    addresses = [];
     //Init the TXs RAM cache.
     txs = {};
 
@@ -149,19 +132,11 @@ module.exports = async () => {
     //Run it now so everything is ready.
     await getTXs('hard');
 
-    //Get each address and add it to the address array.
-    var temp = await client.listReceivedByAddress(0, true);
-    for (var i in temp) {
-        addresses.push(temp[i].address);
-    }
-
     //Return the functions.
     return {
         createAddress: createAddress,
-        ownAddress: ownAddress,
         getTransactions: getTransactions,
         send: send,
-        listUnspent: listUnspent,
         checkSender: checkSender,
         fixAmountSend: fixAmountSend
     };

@@ -93,7 +93,8 @@ async function main() {
 
     //Set the core libs to a global object, so they're accessible by commands.
     process.core = {};
-    //Require and init the coin lib, set by the settings.
+    //Require and init the komodo lib.
+    process.core.komodo = await (require("./core/komodo.js"))();
     process.core.coin = await (require("./core/crypto.js"))();
     //Require and init the users lib.
     process.core.users = await (require("./core/users.js"))();
