@@ -19,6 +19,9 @@ Prints your **balance**.
 \`\`\`` + botsymbol + ` rain <AMOUNT> <MAX>\`\`\` 
 **Rain** the AMOUNT divided by <MAX> count of online users. If count is not provided is assumed as "all".
 
+\`\`\`` + botsymbol + ` request <AMOUNT> <CURRENCY> | request <check> <OPID|ADDRESS> \`\`\` 
+**Request** the specified AMOUNT in CURRENCY (usd|eur|etc.) in a new payment address or **Check** the specified OPID request.
+
 \`\`\`` + botsymbol + ` deposit\`\`\`
 
 Prints your personal reusable deposit **address**.`

@@ -100,7 +100,11 @@ async function main() {
     process.core.users = await (require("./core/users.js"))();
     //Require and init the routing lib.
     process.core.router = await (require("./core/router.js"))();
+    //Require and init the requests lib.
+    process.core.requests = await (require("./core/requests.js"))();
     
+    process.core.requests.check()
+
     //Run discord bot
     process.core.router.connectdiscord()
 
@@ -111,6 +115,7 @@ async function main() {
         balance:  require("./commands/balance.js"),
         tip:      require("./commands/tip.js"),
         withdraw: require("./commands/withdraw.js"),
+        request: require("./commands/request.js"),
         rain: require("./commands/rain.js")
     };
 }

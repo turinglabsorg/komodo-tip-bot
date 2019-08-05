@@ -11,6 +11,7 @@ node_modules/
 
 #PouchDB databases
 users/
+requests/
 
 # Output of 'npm pack'.
 *.tgz

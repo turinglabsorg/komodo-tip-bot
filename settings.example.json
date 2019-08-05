@@ -8,6 +8,7 @@
     
     "coin": {
         "name": "COINNAME",
+        "coingecko": "COINGECKO-ID",
         "symbol": "TICKER",
         "decimals": 8,
         "withdrawFee": 0.01,
