@@ -3,77 +3,17 @@ var BN = require("bignumber.js");
 var PouchDB = require("pouchdb");
 const uuidv4 = require('uuid/v4');
 
-BN.config({
-    ROUNDING_MODE: BN.ROUND_DOWN,
-    EXPONENTIAL_AT: process.settings.coin.decimals + 1
-});
-
-//RAM cache of users.
-var users;
-
-//Array of every handled TX hash.
-var handled;
-
-//Checks an amount for validity.
-async function checkAmount(amount) {
-    //If the amount is invalid...
-    if(!amount){
-        return false
-    }
-    //Else, return true.
-    return true;
-}
-
-//Finds user in database
-async function findUser(user, client){
-    return new Promise(async response => {
-        var db = new PouchDB('users');
-        var dbcheck = await db.allDocs()
-        var found = false
-        for(var i = 0; i < dbcheck.rows.length; i++){
-            let entry = dbcheck.rows[i]
-            let userDB = await db.get(entry.id)
-            if(userDB[client + '_id'] !== undefined && userDB[client + '_id'] === user){
-                found = userDB
-            }
-        }
-        response(found)
-    })
-}
-
-//Creates a new user.
-async function create(user, client) {
-    //If the user already exists, return.
-    return new Promise(async response => {
-
-        let found = await findUser(user, client)
-
-        if(found === false){
-            let toStore = {}
-            toStore[client + '_id'] = user
-            toStore['address'] = ''
-            toStore['notify'] = 0
-    
-            var db = new PouchDB('users')
-            await db.post(toStore)
-            let newAddress = await process.core.coin.createAddress()
-            await setAddress(user, newAddress, client);
-            response(true)
-        }else{
-            response(false)
-        }
-    })
-}
-
 //Create user's request
-async function create(user, address, amount) {
+async function create(user, address, amount, coins, client) {
     return new Promise(async response => {
         let id = uuidv4();
         let request = {
             user: user,
+            client: client,
             address: address,
             timestamp: new Date().getTime(),
-            amount: amount,
+            amount: parseFloat(amount),
+            coins: coins,
             received: 0,
             state: 'pending',
             _id: id
@@ -94,18 +34,87 @@ async function check() {
             let entry = requests.rows[i]
             let request = await db.get(entry.id)
             if(request.state === 'pending'){
-                //console.log(request)
+                let balance = await process.core.coin.listReceived(request.address)
+                if(balance > 0){
+                    request.received = balance
+                    if(balance >= parseFloat(request.amount)){
+                        request.state = 'filled'
+                    }
+                    await db.put(request)
+                }
+            }
+
+            //Expires the request
+            if(request.state !== 'expired'){
+                let now = new Date().getTime()
+                let elapsed = (now - request.timestamp) / 1000
+                let days = elapsed / 60 / 60 / 24
+                if(days >= 7){
+                    request.state = 'expired'
+                    await db.put(request)
+                }
+
+                //Check if there's balance and send the coin to the user.
+                let balance = await process.core.coin.getBalance(request.address)
+                if(balance > 0){
+                    var user = await process.core.users.findUser(request.user, request.client);
+                    let amount = BN(balance).minus(BN(process.settings.coin.withdrawFee));
+                    var hash = await process.core.coin.send(request.address, user.address, amount);
+                    console.log('Sending '+ amount +' back to the user, txid is: ' + hash)
+                }
+
             }
         }
         response(true) 
     })
 }
 
-module.exports = async () => {
+//Return a request
+async function search(opid) {
+    return new Promise(async response => {
+        var db = new PouchDB('requests')
+        let request = await db.get(opid)
+        request.received = await process.core.coin.listReceived(request.address)
+        await db.put(request)
+        response(request) 
+    })
+}
 
+//Withdraw from a request
+async function withdraw(opid) {
+    return new Promise(async response => {
+        var db = new PouchDB('requests')
+        let request = await db.get(opid)
+        request.state = 'closed'
+        if(request.address){
+            let balance = await process.core.coin.getBalance(request.address)
+            if(balance > 0){
+                var user = await process.core.users.findUser(request.user, request.client);
+                let amount = BN(request.received).minus(BN(process.settings.coin.withdrawFee));
+                var hash = await process.core.coin.send(request.address, user.address, amount);
+                console.log('Sending back to the user.')
+            }
+            await db.put(request)
+            response({
+                balance: balance,
+                txid: hash
+            })
+        }else{
+            response(false)
+        }
+    })
+}
+
+module.exports = async () => {
+    setInterval(function(){
+        console.log('Checking all the requests..')
+        check()
+    }, 60000)
     //Return all the functions.
     return {
         create: create,
-        check: check
+        check: check,
+        search: search,
+        withdraw: withdraw
     };
 };

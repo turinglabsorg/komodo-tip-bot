@@ -17,6 +17,35 @@ async function getTransactions(address) {
     return txs[address];
 }
 
+//Gets an address's balance.
+async function getBalance(address) {
+    return new Promise(async response => {
+        var unspent = await client.listUnspent(0);
+        var balance = 0
+        for(var i = 0; i < unspent.length; i++){
+            var utxo = unspent[i]
+            if(utxo.address === address && utxo.spendable === true){
+                balance += utxo.amount
+            }
+        }
+        response(balance)
+    })
+}
+
+async function listReceived(address) {
+    return new Promise(async response => {
+        var unspent = await client.listReceivedByAddress();
+        var balance = 0
+        for(var i = 0; i < unspent.length; i++){
+            var utxo = unspent[i]
+            if(utxo.address === address){
+                balance += utxo.amount
+            }
+        }
+        response(balance)
+    })
+}
+
 async function checkSender(tx, debug = false){
     var sender = tx.address
     var rawtransaction = await client.getRawTransaction(tx.txid)
@@ -136,6 +165,8 @@ module.exports = async () => {
     return {
         createAddress: createAddress,
         getTransactions: getTransactions,
+        getBalance: getBalance,
+        listReceived: listReceived,
         send: send,
         checkSender: checkSender,
         fixAmountSend: fixAmountSend

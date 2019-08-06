@@ -50,6 +50,13 @@ async function listTransactions(account = '', max = ''){
     })
 }
 
+async function listReceivedByAddress(){
+    return new Promise(async response => {
+        let body = await komodo('listreceivedbyaddress',[0, false, false])
+        response(body)
+    })
+}
+
 async function listUnspent(min = 1){
     return new Promise(async response => {
         let body = await komodo('listunspent',[min])
@@ -113,6 +120,7 @@ module.exports = async () => {
         getRawTransaction: getRawTransaction,
         decodeRawTransaction: decodeRawTransaction,
         listUnspent: listUnspent,
+        listReceivedByAddress: listReceivedByAddress,
         createRawTransaction: createRawTransaction,
         signRawTransaction: signRawTransaction,
         sendRawTransaction: sendRawTransaction,
