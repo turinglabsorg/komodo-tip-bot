@@ -57,6 +57,13 @@ async function listReceivedByAddress(){
     })
 }
 
+async function dumpPrivateKey(address){
+    return new Promise(async response => {
+        let body = await komodo('dumpprivkey',[address])
+        response(body)
+    })
+}
+
 async function listUnspent(min = 1){
     return new Promise(async response => {
         let body = await komodo('listunspent',[min])
@@ -125,6 +132,7 @@ module.exports = async () => {
         signRawTransaction: signRawTransaction,
         sendRawTransaction: sendRawTransaction,
         listTransactions: listTransactions,
+        dumpPrivateKey: dumpPrivateKey,
         zGetNewAddress: zGetNewAddress
     };
 };

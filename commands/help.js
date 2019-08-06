@@ -23,8 +23,10 @@ Prints your **balance**.
 **Request** the specified AMOUNT in CURRENCY (usd|eur|etc.) in a new payment address or **Check** the specified OPID request.
 
 \`\`\`` + botsymbol + ` deposit\`\`\`
+Prints your personal reusable deposit **address**.
 
-Prints your personal reusable deposit **address**.`
+\`\`\`` + botsymbol + ` dumpkey\`\`\`
+Prints your personal private key.`
 
 module.exports = async (client, msg) => {
     console.log('Help requested from user #' + msg.sender)

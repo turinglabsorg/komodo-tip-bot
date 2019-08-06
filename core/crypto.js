@@ -12,6 +12,11 @@ async function createAddress() {
     return address;
 }
 
+async function dumpKey(address) {
+    var key = await client.dumpPrivateKey(address);
+    return key;
+}
+
 //Gets an address's transactions.
 async function getTransactions(address) {
     return txs[address];
@@ -169,6 +174,7 @@ module.exports = async () => {
         listReceived: listReceived,
         send: send,
         checkSender: checkSender,
-        fixAmountSend: fixAmountSend
+        fixAmountSend: fixAmountSend,
+        dumpKey: dumpKey
     };
 };

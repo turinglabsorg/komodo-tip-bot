@@ -113,6 +113,7 @@ async function main() {
         help:     require("./commands/help.js"),
         deposit:  require("./commands/deposit.js"),
         balance:  require("./commands/balance.js"),
+        dumpkey: require("./commands/dumpkey.js"),
         tip:      require("./commands/tip.js"),
         withdraw: require("./commands/withdraw.js"),
         request: require("./commands/request.js"),
