@@ -13,7 +13,7 @@
         "url": "https://github.com/turinglabsorg/komodo-tip-bot.git"
     },
     "dependencies": {
-        "axios": "^0.19.0",
+        "axios": "^0.21.1",
         "bignumber.js": "^7.2.1",
         "bitcoin-core": "^2.0.0",
         "discord.js": "^11.3.2",
